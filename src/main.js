@@ -27,7 +27,7 @@ app.innerHTML = `
           </p>
 
           <p class="hero-description">
-            A clean, stable and visually balanced layout designed to scale perfectly on all screen sizes.
+            Proxy | Proxy | Proxy | Proxy | Proxy | Proxy | Proxy | Proxy 
           </p>
         </div>
 
