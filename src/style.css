@@ -35,6 +35,7 @@
 html {
     scroll-behavior: smooth;
     scroll-snap-type: y mandatory;
+    background-color: #050b14;
 }
 
 body {
