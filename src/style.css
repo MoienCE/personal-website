@@ -1,0 +1,609 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;800&display=swap');
+
+:root {
+  --bg: #07111f;
+  --bg-soft: #0d1728;
+  --panel: rgba(255, 255, 255, 0.08);
+  --panel-strong: rgba(255, 255, 255, 0.12);
+  --line: rgba(255, 255, 255, 0.1);
+  --text: #ecf3ff;
+  --muted: #aac0dd;
+  --accent: #7c9cff;
+  --accent-2: #67e8f9;
+  --shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+  --radius-xl: 32px;
+  --radius-lg: 24px;
+  --radius-md: 18px;
+  --container: 1200px;
+
+  --nav-left-gap: 28px;
+  --card-open-width: 142px;
+  --card-open-height: 118px;
+  --card-collapsed-width: 18px;
+  --card-collapsed-height: 74px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top right, rgba(103, 232, 249, 0.1), transparent 24%),
+    radial-gradient(circle at top left, rgba(124, 156, 255, 0.14), transparent 30%),
+    linear-gradient(180deg, #050b14 0%, #081220 50%, #09101a 100%);
+  min-width: 320px;
+  overflow-x: hidden;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  font: inherit;
+}
+
+.page-shell {
+  overflow-x: clip;
+}
+
+.container {
+  width: min(calc(100% - 32px), var(--container));
+  margin-inline: auto;
+}
+
+/* ========== HERO ========== */
+
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding-block: 80px;
+  overflow: hidden;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(124, 156, 255, 0.28), transparent 34%),
+    radial-gradient(circle at 82% 24%, rgba(103, 232, 249, 0.22), transparent 32%),
+    radial-gradient(circle at 55% 82%, rgba(139, 92, 246, 0.18), transparent 36%),
+    linear-gradient(135deg, #050b14, #081220, #111827, #0b1020);
+  background-size: 180% 180%;
+  animation: heroGradientMove 14s ease-in-out infinite;
+}
+
+@keyframes heroGradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.42;
+  transform: translateZ(0);
+}
+
+.orb-1 {
+  width: 640px;
+  height: 640px;
+  background: radial-gradient(circle, rgba(124, 156, 255, 0.9), transparent 62%);
+  top: -220px;
+  right: -120px;
+  animation: orbFloatOne 10s ease-in-out infinite;
+}
+
+.orb-2 {
+  width: 560px;
+  height: 560px;
+  background: radial-gradient(circle, rgba(103, 232, 249, 0.75), transparent 64%);
+  bottom: -180px;
+  left: -120px;
+  animation: orbFloatTwo 12s ease-in-out infinite;
+}
+
+@keyframes orbFloatOne {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate(-40px, 50px) scale(1.08);
+  }
+}
+
+@keyframes orbFloatTwo {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate(45px, -35px) scale(1.1);
+  }
+}
+
+/* Grid قبلی عمداً حذف شده */
+.grid {
+  display: none;
+}
+
+.hero-layout {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .hero-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 520px);
+    gap: 72px;
+  }
+}
+
+.hero-copy {
+  order: 2;
+}
+
+@media (min-width: 768px) {
+  .hero-copy {
+    order: 1;
+  }
+}
+
+.hero-name {
+  font-size: clamp(2.75rem, 7vw, 5.5rem);
+  font-weight: 800;
+  margin: 0 0 16px;
+  line-height: 1.04;
+  letter-spacing: -0.06em;
+  background: linear-gradient(135deg, var(--text), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-keywords {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: var(--accent);
+  margin: 0 0 24px;
+  font-weight: 500;
+}
+
+.hero-description {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: var(--muted);
+  margin: 0;
+  max-width: 600px;
+}
+
+.hero-media {
+  order: 1;
+  display: flex;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .hero-media {
+    order: 2;
+    justify-content: flex-end;
+  }
+}
+
+.portrait-frame {
+  position: relative;
+  width: min(42vw, 520px);
+  min-width: 330px;
+  aspect-ratio: 3 / 4;
+  border-radius: 40px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: var(--panel);
+  box-shadow:
+    0 40px 100px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.portrait-glow {
+  position: absolute;
+  inset: -45%;
+  background:
+    radial-gradient(circle at 40% 35%, rgba(103, 232, 249, 0.55), transparent 35%),
+    radial-gradient(circle at 70% 65%, rgba(124, 156, 255, 0.55), transparent 45%);
+  opacity: 0.44;
+  filter: blur(42px);
+  animation: pulse 4.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.34;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.58;
+    transform: scale(1.08);
+  }
+}
+
+.portrait {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ========== LEFT FLOATING NAV CARDS ========== */
+
+.nav-panel-wrap {
+  position: fixed;
+  left: var(--nav-left-gap);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 9999;
+  width: var(--card-open-width);
+  max-width: calc(100vw - 24px);
+  pointer-events: none;
+  transition:
+    width 260ms ease,
+    left 260ms ease;
+}
+
+.sections-strip {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  gap: 14px;
+  width: 100%;
+  padding: 0;
+  pointer-events: auto;
+}
+
+/* حالت عادی کارت‌ها: در hero کاملاً باز */
+.section-card {
+  width: var(--card-open-width);
+  height: var(--card-open-height);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.065));
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  padding: 14px;
+  cursor: pointer;
+  box-shadow: 0 14px 42px rgba(0, 0, 0, 0.24);
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  isolation: isolate;
+  transition:
+    width 280ms ease,
+    height 280ms ease,
+    min-height 280ms ease,
+    padding 280ms ease,
+    border-radius 280ms ease,
+    transform 220ms ease,
+    background 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease,
+    opacity 220ms ease;
+}
+
+.section-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(103, 232, 249, 0.22), transparent 38%),
+    radial-gradient(circle at 70% 80%, rgba(124, 156, 255, 0.2), transparent 42%);
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.section-card:hover,
+.section-card:focus-visible,
+.section-card.active {
+  transform: translateX(6px);
+  background:
+    linear-gradient(180deg, rgba(124, 156, 255, 0.23), rgba(103, 232, 249, 0.13));
+  border-color: rgba(255, 255, 255, 0.24);
+  box-shadow: 0 22px 58px rgba(0, 0, 0, 0.34);
+}
+
+.section-card:hover::before,
+.section-card:focus-visible::before,
+.section-card.active::before {
+  opacity: 1;
+}
+
+.section-card:focus-visible {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 4px;
+}
+
+.section-card-icon {
+  font-size: 1.45rem;
+  line-height: 1;
+  color: var(--accent-2);
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease;
+}
+
+.section-card strong {
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.1;
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease;
+}
+
+/* خارج از hero: کارت‌ها جمع می‌شوند و شبیه چهار خط ضخیم می‌شوند */
+body:not(.is-hero) .nav-panel-wrap {
+  width: var(--card-collapsed-width);
+}
+
+body:not(.is-hero) .section-card {
+  width: var(--card-collapsed-width);
+  height: var(--card-collapsed-height);
+  min-height: var(--card-collapsed-height);
+  padding: 0;
+  border-radius: 999px;
+  opacity: 0.54;
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+}
+
+body:not(.is-hero) .section-card:hover {
+  transform: none;
+}
+
+body:not(.is-hero) .section-card.active {
+  opacity: 1;
+  background: linear-gradient(180deg, rgba(103, 232, 249, 0.95), rgba(124, 156, 255, 0.82));
+  border-color: rgba(255, 255, 255, 0.34);
+  box-shadow:
+    0 0 0 4px rgba(103, 232, 249, 0.08),
+    0 18px 48px rgba(103, 232, 249, 0.18);
+}
+
+body:not(.is-hero) .section-card-icon,
+body:not(.is-hero) .section-card strong {
+  opacity: 0;
+  transform: translateX(-14px);
+}
+
+/* Hover روی محدوده کارت‌ها در سکشن‌های دیگر: کارت‌ها باز می‌شوند */
+body:not(.is-hero) .nav-panel-wrap:hover,
+body:not(.is-hero) .nav-panel-wrap:focus-within {
+  width: var(--card-open-width);
+}
+
+body:not(.is-hero) .nav-panel-wrap:hover .section-card,
+body:not(.is-hero) .nav-panel-wrap:focus-within .section-card {
+  width: var(--card-open-width);
+  height: var(--card-open-height);
+  min-height: var(--card-open-height);
+  padding: 14px;
+  border-radius: var(--radius-lg);
+  opacity: 1;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.065));
+}
+
+body:not(.is-hero) .nav-panel-wrap:hover .section-card.active,
+body:not(.is-hero) .nav-panel-wrap:focus-within .section-card.active {
+  background:
+    linear-gradient(180deg, rgba(124, 156, 255, 0.25), rgba(103, 232, 249, 0.16));
+}
+
+body:not(.is-hero) .nav-panel-wrap:hover .section-card-icon,
+body:not(.is-hero) .nav-panel-wrap:hover .section-card strong,
+body:not(.is-hero) .nav-panel-wrap:focus-within .section-card-icon,
+body:not(.is-hero) .nav-panel-wrap:focus-within .section-card strong {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ========== FULLSCREEN SECTIONS ========== */
+
+.content-section {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 32px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  scroll-margin-top: 0;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.content-section .section-inner {
+  width: min(100%, 1100px);
+  padding-left: 190px;
+}
+
+.tone-a {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(124, 156, 255, 0.14), transparent 25%),
+    linear-gradient(180deg, #081220 0%, #091523 100%);
+}
+
+.tone-b {
+  background:
+    radial-gradient(circle at 80% 30%, rgba(103, 232, 249, 0.12), transparent 25%),
+    linear-gradient(180deg, #07101b 0%, #0a1421 100%);
+}
+
+.section-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100%;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.section-kicker {
+  font-size: 1.3rem;
+  color: var(--accent-2);
+}
+
+.section-head h2 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1.1;
+}
+
+.section-placeholder {
+  margin: 0;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  line-height: 1.8;
+  color: var(--muted);
+  max-width: 700px;
+}
+
+/* ========== RESPONSIVE ========== */
+
+@media (max-width: 767px) {
+  :root {
+    --nav-left-gap: 14px;
+    --card-open-width: 112px;
+    --card-open-height: 92px;
+    --card-collapsed-width: 14px;
+    --card-collapsed-height: 58px;
+  }
+
+  html {
+    scroll-snap-type: y mandatory;
+  }
+
+  .hero {
+    padding-block: 48px;
+  }
+
+  .hero-layout {
+    gap: 34px;
+  }
+
+  .hero-copy {
+    text-align: center;
+  }
+
+  .hero-description {
+    margin-inline: auto;
+  }
+
+  .portrait-frame {
+    width: min(72vw, 380px);
+    min-width: 260px;
+    border-radius: 32px;
+  }
+
+  .content-section {
+    padding: 32px 16px;
+  }
+
+  .content-section .section-inner {
+    padding-left: 64px;
+  }
+
+  .sections-strip {
+    gap: 10px;
+  }
+
+  .section-card-icon {
+    font-size: 1.15rem;
+  }
+
+  .section-card strong {
+    font-size: 0.78rem;
+  }
+}
+
+@media (max-width: 420px) {
+  :root {
+    --nav-left-gap: 10px;
+    --card-open-width: 100px;
+    --card-open-height: 86px;
+  }
+
+  .content-section .section-inner {
+    padding-left: 54px;
+  }
+
+  .hero-name {
+    font-size: clamp(2.5rem, 16vw, 4rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
