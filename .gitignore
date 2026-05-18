@@ -1,2 +1,4 @@
 node_modules/
+dist/
 personal-website.zip
+*:Zone.Identifier
