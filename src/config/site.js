@@ -4,7 +4,7 @@ const portraitImage = new URL('../../assets/OnMount.jpg', import.meta.url).href
 export const siteConfig = {
   hero: {
     name: 'Moien34',
-    eyebrow: 'Personal website',
+    eyebrow: '',
     portrait: {
       src: portraitImage,
       alt: 'Moien standing on a mountain'
