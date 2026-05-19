@@ -1,10 +1,10 @@
 import './style.css'
 import { siteConfig } from './config/site.js'
 import { createDebugLogger } from './lib/debug.js'
+import { timelineData } from './config/timeline.js'
+import { createTimeline } from './lib/timeline.js'
 
 const ROOT_SELECTOR = '#app'
-const OBSERVER_THRESHOLDS = [0.35, 0.5, 0.65, 0.8]
-
 const debug = createDebugLogger('personal-site')
 const root = document.querySelector(ROOT_SELECTOR)
 
@@ -54,12 +54,18 @@ function mountApp(app, config) {
       return
     }
 
-    target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    document.documentElement.classList.remove('is-timeline-scrolling')
+    window.scrollTo({
+      top: target.offsetTop,
+      behavior: 'smooth'
+    })
   }
 
   nav?.addEventListener('click', (event) => {
     const card = event.target.closest('[data-section-card]')
     if (!card) return
+
+    if (card.dataset.target === activeSectionId) return
 
     scrollToSection(card.dataset.target)
   })
@@ -68,6 +74,9 @@ function mountApp(app, config) {
   observeActiveSection(observedSections, setActiveSection)
   enableKeyboardNavigation(sectionIds, () => activeSectionId, scrollToSection)
   exposeDebugTools({ config, getActiveSection: () => activeSectionId })
+
+  const timelineSection = app.querySelector('[data-timeline-scene]')
+  if (timelineSection) createTimeline(timelineSection, timelineData)
 
   debug.info('mounted', { sections: sectionIds })
 }
@@ -124,6 +133,11 @@ function renderHero(hero) {
 
 function renderContentSection(section, index) {
   const toneClass = index % 2 === 0 ? 'tone-a' : 'tone-b'
+  const isTimeline = section.id === 'timeline'
+
+  if (isTimeline) {
+    return renderTimelineSection(section, toneClass)
+  }
 
   return `
     <section
@@ -139,6 +153,40 @@ function renderContentSection(section, index) {
         </div>
 
         <p class="section-placeholder">${escapeHtml(section.summary)}</p>
+      </div>
+    </section>
+  `
+}
+
+function renderTimelineSection(section, toneClass) {
+  return `
+    <section
+      class="timeline-section ${toneClass}"
+      id="${escapeHtml(section.id)}"
+      data-section-title="${escapeHtml(section.title)}"
+      data-observe-section
+      data-timeline-scene
+    >
+      <div class="timeline-sticky">
+        <div class="container timeline-shell">
+          <header class="timeline-heading">
+            <span class="section-kicker" aria-hidden="true">${escapeHtml(section.icon)}</span>
+            <div>
+              <p class="timeline-label">Life Journey</p>
+              <h2>${escapeHtml(section.title)}</h2>
+            </div>
+          </header>
+
+          <article class="timeline-detail" data-timeline-detail aria-live="polite"></article>
+          <svg class="timeline-connector" data-timeline-connector aria-hidden="true">
+            <polyline data-timeline-connector-line points=""></polyline>
+          </svg>  
+
+          <div class="timeline-viewport" data-timeline-viewport>
+            <div class="timeline-trigger" aria-hidden="true"></div>
+            <div class="timeline-track" data-timeline-track></div>
+          </div>
+        </div>
       </div>
     </section>
   `
@@ -179,28 +227,35 @@ function renderList(items, className) {
 }
 
 function observeActiveSection(sections, onActiveSection) {
-  if (!('IntersectionObserver' in window)) {
-    debug.warn('IntersectionObserver is not available; active nav state will stay on hero')
-    return
+  let frame = null
+
+  const updateActiveSection = () => {
+    frame = null
+
+    const viewportAnchor = window.innerHeight * 0.45
+    const activeSection = sections.find((section) => {
+      const rect = section.getBoundingClientRect()
+      return rect.top <= viewportAnchor && rect.bottom > viewportAnchor
+    })
+
+    if (activeSection) onActiveSection(activeSection.id)
   }
 
-  const observer = new IntersectionObserver(
-    (entries) => {
-      const activeEntry = entries
-        .filter((entry) => entry.isIntersecting)
-        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+  const scheduleUpdate = () => {
+    if (frame) return
+    frame = window.requestAnimationFrame(updateActiveSection)
+  }
 
-      if (activeEntry) onActiveSection(activeEntry.target.id)
-    },
-    { threshold: OBSERVER_THRESHOLDS }
-  )
-
-  sections.forEach((section) => observer.observe(section))
+  window.addEventListener('scroll', scheduleUpdate, { passive: true })
+  window.addEventListener('resize', scheduleUpdate)
+  updateActiveSection()
 }
 
 function enableKeyboardNavigation(sectionIds, getActiveSectionId, scrollToSection) {
   document.addEventListener('keydown', (event) => {
     if (event.defaultPrevented || shouldIgnoreShortcut(event.target)) return
+
+    if (getActiveSectionId() === 'timeline') return
 
     const direction = getKeyboardDirection(event.key)
     if (!direction) return
