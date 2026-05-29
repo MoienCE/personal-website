@@ -3,8 +3,11 @@ import { createDebugLogger } from './debug.js'
 const debug = createDebugLogger('timeline')
 const DEFAULT_ACTIVE_OFFSET = 0.5
 const DEFAULT_POINT_GAP = 260
+const DEFAULT_MIN_POINT_GAP = 210
+const DEFAULT_MAX_POINT_GAP = 460
 const DEFAULT_MIN_SCROLL_VH = 180
 const DETAIL_SWAP_MS = 140
+const ACTIVE_UPDATE_THRESHOLD = 24
 
 export function createTimeline(scene, data) {
   const viewport = scene.querySelector('[data-timeline-viewport]')
@@ -28,6 +31,8 @@ export function createTimeline(scene, data) {
   const settings = {
     activeOffset: data.activeOffset ?? DEFAULT_ACTIVE_OFFSET,
     pointGap: data.pointGap ?? DEFAULT_POINT_GAP,
+    minPointGap: data.minPointGap ?? DEFAULT_MIN_POINT_GAP,
+    maxPointGap: data.maxPointGap ?? DEFAULT_MAX_POINT_GAP,
     minScrollVh: data.minScrollVh ?? DEFAULT_MIN_SCROLL_VH
   }
 
@@ -36,6 +41,10 @@ export function createTimeline(scene, data) {
     hoverId: null,
     positions: new Map(),
     maxTranslate: 0,
+    activeX: 0,
+    translate: 0,
+    lastDecoratedId: null,
+    lastDecorationTranslate: null,
     frame: null,
     detailTimer: null
   }
@@ -105,15 +114,45 @@ export function createTimeline(scene, data) {
 
 function normalizeMilestones(milestones = []) {
   return milestones
-    .filter((milestone) => milestone?.id && Number.isFinite(Number(milestone.year)))
-    .map((milestone) => ({
-      ...milestone,
-      title: milestone.title ?? milestone.name ?? '',
-      type: milestone.type === 'minor' ? 'minor' : 'major',
-      year: Number(milestone.year),
-      media: normalizeMedia(milestone.media)
-    }))
+    .map((milestone) => {
+      const timelineDate = parseTimelineDate(milestone?.year)
+
+      if (!milestone?.id || !timelineDate) return null
+
+      return {
+        ...milestone,
+        title: milestone.title ?? milestone.name ?? '',
+        type: String(milestone.type).toLowerCase() === 'minor' ? 'minor' : 'major',
+        year: timelineDate.value,
+        yearLabel: timelineDate.label,
+        media: normalizeMedia(milestone.media)
+      }
+    })
+    .filter(Boolean)
     .sort((first, second) => first.year - second.year)
+}
+
+function parseTimelineDate(year) {
+  const [yearPart, monthPart] = String(year ?? '').trim().split('.')
+  const parsedYear = Number(yearPart)
+
+  if (!Number.isInteger(parsedYear)) return null
+
+  if (monthPart === undefined) {
+    return {
+      value: parsedYear,
+      label: String(parsedYear)
+    }
+  }
+
+  const parsedMonth = Number(monthPart)
+
+  if (!Number.isInteger(parsedMonth) || parsedMonth < 1 || parsedMonth > 12) return null
+
+  return {
+    value: parsedYear + (parsedMonth - 1) / 12,
+    label: `${parsedYear}.${parsedMonth}`
+  }
 }
 
 function normalizeMedia(media) {
@@ -134,7 +173,7 @@ function renderPoints(track, milestones) {
 
 function renderPoint(milestone) {
   const isMajor = milestone.type === 'major'
-  const label = milestone.title ? `${milestone.title}, ${milestone.year}` : `Sub-interval, ${milestone.year}`
+  const label = milestone.title ? `${milestone.title}, ${milestone.yearLabel}` : `Sub-interval, ${milestone.yearLabel}`
 
   return `
     <button
@@ -153,7 +192,7 @@ function renderPointLabel(milestone) {
   return `
     <span class="timeline-point__label">
       <span class="timeline-point__title">${escapeHtml(milestone.title)}</span>
-      <span class="timeline-point__year">${milestone.year}</span>
+      <span class="timeline-point__year">${escapeHtml(milestone.yearLabel)}</span>
     </span>
   `
 }
@@ -164,27 +203,39 @@ function layoutTrack(scene, viewport, track, milestones, points, settings, state
   const activeX = viewportWidth * settings.activeOffset
   const startPadding = activeX
   const endPadding = viewportWidth - activeX
-  const yearStart = milestones[0].year
-  const yearEnd = milestones[milestones.length - 1].year
-  const yearRange = Math.max(1, yearEnd - yearStart)
-  const journeyWidth = Math.max((milestones.length - 1) * settings.pointGap, viewportWidth * 1.25)
+  const positions = calculateTimelinePositions(milestones, settings)
+  const journeyWidth = Math.max(positions[positions.length - 1] ?? 0, viewportWidth * 1.25)
   const trackWidth = startPadding + journeyWidth + endPadding
 
   state.positions.clear()
   state.maxTranslate = Math.max(0, trackWidth - viewportWidth)
+  state.activeX = activeX
 
   scene.style.minHeight = `${Math.max(viewportHeight + state.maxTranslate, viewportHeight * (settings.minScrollVh / 100))}px`
   viewport.style.setProperty('--timeline-active-x', `${activeX}px`)
   track.style.width = `${trackWidth}px`
 
   points.forEach((point) => {
-    const milestone = milestones.find((item) => item.id === point.dataset.timelinePoint)
-    const progress = milestone ? (milestone.year - yearStart) / yearRange : 0
-    const x = startPadding + progress * journeyWidth
+    const milestoneIndex = milestones.findIndex((item) => item.id === point.dataset.timelinePoint)
+    const x = startPadding + (positions[milestoneIndex] ?? 0)
 
     state.positions.set(point.dataset.timelinePoint, x)
     point.style.left = `${x}px`
   })
+}
+
+function calculateTimelinePositions(milestones, settings) {
+  return milestones.reduce((positions, milestone, index) => {
+    if (index === 0) return [0]
+
+    const previousMilestone = milestones[index - 1]
+    const yearGap = Math.max(0, milestone.year - previousMilestone.year)
+    const distanceFactor = clamp(0.75 + Math.log1p(yearGap * 2) * 0.35, 0.75, 1.65)
+    const gap = clamp(settings.pointGap * distanceFactor, settings.minPointGap, settings.maxPointGap)
+
+    positions.push(positions[index - 1] + gap)
+    return positions
+  }, [])
 }
 
 function updateFromScroll(scene, viewport, track, segment, connector, connectorLine, milestones, points, detail, settings, state) {
@@ -195,14 +246,17 @@ function updateFromScroll(scene, viewport, track, segment, connector, connectorL
   const activeX = viewport.clientWidth * settings.activeOffset
   const isInsideTimeline = sceneRect.top < -1 && sceneRect.bottom > window.innerHeight + 1
 
+  state.activeX = activeX
+  state.translate = translate
   document.documentElement.classList.toggle('is-timeline-scrolling', isInsideTimeline)
   track.style.transform = `translate3d(${translate}px, 0, 0)`
 
   const activeId = state.hoverId || findNearestPoint(activeX, translate, milestones, state.positions)
-  updateActiveDecorations(activeId, milestones, points, detail, segment, connector, connectorLine, state)
 
   if (!state.hoverId) {
     activateMilestone(activeId, milestones, points, detail, segment, connector, connectorLine, state)
+  } else {
+    updateActiveDecorations(activeId, milestones, segment, connector, connectorLine, state)
   }
 }
 
@@ -223,16 +277,28 @@ function activateMilestone(id, milestones, points, detail, segment, connector, c
 
   if (didChange) {
     swapDetail(detail, milestone, state, () => {
-      updateActiveDecorations(id, milestones, points, detail, segment, connector, connectorLine, state)
+      updateActiveDecorations(id, milestones, segment, connector, connectorLine, state, true)
     })
   } else {
-    updateActiveDecorations(id, milestones, points, detail, segment, connector, connectorLine, state)
+    updateActiveDecorations(id, milestones, segment, connector, connectorLine, state)
   }
 }
 
-function updateActiveDecorations(id, milestones, points, detail, segment, connector, connectorLine, state) {
+function updateActiveDecorations(id, milestones, segment, connector, connectorLine, state, force = false) {
+  if (!shouldUpdateDecorations(id, state, force)) return
+
+  state.lastDecoratedId = id
+  state.lastDecorationTranslate = state.translate
+
   updateLocalSegment(segment, id, milestones, state.positions)
-  updateConnector(connector, connectorLine, points.find((point) => point.dataset.timelinePoint === id), detail)
+  updateConnector(connector, connectorLine, id, state)
+}
+
+function shouldUpdateDecorations(id, state, force) {
+  if (force || state.lastDecoratedId !== id) return true
+  if (!Number.isFinite(state.lastDecorationTranslate)) return true
+
+  return Math.abs(state.translate - state.lastDecorationTranslate) > ACTIVE_UPDATE_THRESHOLD
 }
 
 function updateLocalSegment(segment, activeId, milestones, positions) {
@@ -249,24 +315,17 @@ function updateLocalSegment(segment, activeId, milestones, positions) {
   segment.style.width = `${width}px`
 }
 
-function updateConnector(connector, connectorLine, point, detail) {
-  const card = detail.querySelector('.timeline-card')
+function updateConnector(connector, connectorLine, activeId, state) {
+  if (!connector || !connectorLine || !activeId) return
 
-  if (!connector || !connectorLine || !point || !card) return
+  const activePointX = (state.positions.get(activeId) ?? 0) + state.translate
+  const deltaX = activePointX - state.activeX
 
-  const shellRect = connector.getBoundingClientRect()
-  const pointRect = point.getBoundingClientRect()
-  const cardRect = card.getBoundingClientRect()
-  const pointX = pointRect.left + pointRect.width / 2 - shellRect.left
-  const pointY = pointRect.top + pointRect.height / 2 - shellRect.top
-  const cardX = cardRect.left + cardRect.width / 2 - shellRect.left
-  const cardY = cardRect.bottom - shellRect.top
-  const bendY = pointY - Math.max(34, Math.min(96, pointY - cardY))
-  const bendX = pointX + (cardX - pointX) * 0.34
-
-  connectorLine.setAttribute('points', `${cardX},${cardY} ${bendX},${bendY} ${pointX},${pointY}`)
+  connector.style.setProperty('--timeline-connector-delta', `${deltaX}px`)
   connector.classList.add('is-visible')
 }
+
+
 
 function swapDetail(detail, milestone, state, onReady) {
   const nextContent = renderDetail(milestone)
@@ -308,12 +367,18 @@ function renderDetail(milestone) {
         ${renderMedia(milestone)}
       </div>
       <div class="timeline-card__body">
-        <p class="timeline-card__eyebrow">${milestone.year}</p>
+        <p class="timeline-card__eyebrow">${escapeHtml(milestone.yearLabel)}</p>
         <h3 class="timeline-card__title">${escapeHtml(milestone.title || 'Memory')}</h3>
-        <p class="timeline-card__text">${escapeHtml(milestone.description || '')}</p>
+        <div class="timeline-card__text" tabindex="0">${renderRichText(milestone.description || '')}</div>
       </div>
     </div>
   `
+}
+
+function renderRichText(value) {
+  return escapeHtml(value)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`(.+?)`/g, '<code>$1</code>')
 }
 
 function renderMedia(milestone) {

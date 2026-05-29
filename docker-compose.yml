@@ -1,0 +1,7 @@
+services:
+  personal-website:
+    build:
+      context: .
+    ports:
+      - "8080:80"
+    restart: unless-stopped

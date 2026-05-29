@@ -179,11 +179,10 @@ function renderTimelineSection(section, toneClass) {
 
           <article class="timeline-detail" data-timeline-detail aria-live="polite"></article>
           <svg class="timeline-connector" data-timeline-connector aria-hidden="true">
-            <polyline data-timeline-connector-line points=""></polyline>
-          </svg>  
+            <path data-timeline-connector-line d=""></path>
+          </svg>
 
           <div class="timeline-viewport" data-timeline-viewport>
-            <div class="timeline-trigger" aria-hidden="true"></div>
             <div class="timeline-track" data-timeline-track></div>
           </div>
         </div>
