@@ -1,5 +1,6 @@
 export default {
-  server: {
+ base: '/personal-website/',
+ server: {
     host: true,
     allowedHosts: true,
     hmr: {
