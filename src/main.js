@@ -3,12 +3,15 @@ import { siteConfig } from './config/site.js'
 import { createDebugLogger } from './lib/debug.js'
 import { timelineData } from './config/timeline.js'
 import { createTimeline } from './lib/timeline.js'
+import { createLoadingScene } from './lib/loading.js'
 
 const ROOT_SELECTOR = '#app'
 const debug = createDebugLogger('personal-site')
 const root = document.querySelector(ROOT_SELECTOR)
 
-mountApp(root, siteConfig)
+createLoadingScene(root, () => {
+  mountApp(root, siteConfig)
+})
 
 function mountApp(app, config) {
   if (!app) {

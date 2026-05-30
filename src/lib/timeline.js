@@ -1,4 +1,5 @@
 import { createDebugLogger } from './debug.js'
+import { createLightbox } from './lightbox.js'
 
 const debug = createDebugLogger('timeline')
 const DEFAULT_ACTIVE_OFFSET = 0.5
@@ -28,6 +29,8 @@ export function createTimeline(scene, data) {
     return () => {}
   }
 
+  const lightbox = createLightbox()
+
   const settings = {
     activeOffset: data.activeOffset ?? DEFAULT_ACTIVE_OFFSET,
     pointGap: data.pointGap ?? DEFAULT_POINT_GAP,
@@ -46,7 +49,8 @@ export function createTimeline(scene, data) {
     lastDecoratedId: null,
     lastDecorationTranslate: null,
     frame: null,
-    detailTimer: null
+    detailTimer: null,
+    lightbox
   }
 
   renderPoints(track, milestones)
@@ -54,28 +58,32 @@ export function createTimeline(scene, data) {
   const segment = track.querySelector('[data-timeline-segment]')
   const points = [...track.querySelectorAll('[data-timeline-point]')]
 
+  const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+
   points.forEach((point) => {
     const id = point.dataset.timelinePoint
 
-    point.addEventListener('pointerenter', () => {
-      state.hoverId = id
-      activateMilestone(id, milestones, points, detail, segment, connector, connectorLine, state)
-    })
+    if (!isTouchDevice) {
+      point.addEventListener('pointerenter', () => {
+        state.hoverId = id
+        activateMilestone(id, milestones, points, detail, segment, connector, connectorLine, state)
+      })
 
-    point.addEventListener('pointerleave', () => {
-      state.hoverId = null
-      updateFromScroll(scene, viewport, track, segment, connector, connectorLine, milestones, points, detail, settings, state)
-    })
+      point.addEventListener('pointerleave', () => {
+        state.hoverId = null
+        updateFromScroll(scene, viewport, track, segment, connector, connectorLine, milestones, points, detail, settings, state)
+      })
 
-    point.addEventListener('focus', () => {
-      state.hoverId = id
-      activateMilestone(id, milestones, points, detail, segment, connector, connectorLine, state)
-    })
+      point.addEventListener('focus', () => {
+        state.hoverId = id
+        activateMilestone(id, milestones, points, detail, segment, connector, connectorLine, state)
+      })
 
-    point.addEventListener('blur', () => {
-      state.hoverId = null
-      updateFromScroll(scene, viewport, track, segment, connector, connectorLine, milestones, points, detail, settings, state)
-    })
+      point.addEventListener('blur', () => {
+        state.hoverId = null
+        updateFromScroll(scene, viewport, track, segment, connector, connectorLine, milestones, points, detail, settings, state)
+      })
+    }
   })
 
   const scheduleUpdate = () => {
@@ -225,13 +233,20 @@ function layoutTrack(scene, viewport, track, milestones, points, settings, state
 }
 
 function calculateTimelinePositions(milestones, settings) {
+  const isMobile = window.innerWidth <= 767
+  const mobileMultiplier = 0.7
+  
   return milestones.reduce((positions, milestone, index) => {
     if (index === 0) return [0]
 
     const previousMilestone = milestones[index - 1]
     const yearGap = Math.max(0, milestone.year - previousMilestone.year)
     const distanceFactor = clamp(0.75 + Math.log1p(yearGap * 2) * 0.35, 0.75, 1.65)
-    const gap = clamp(settings.pointGap * distanceFactor, settings.minPointGap, settings.maxPointGap)
+    
+    let gap = clamp(settings.pointGap * distanceFactor, settings.minPointGap, settings.maxPointGap)
+    if (isMobile) {
+      gap = gap * mobileMultiplier
+    }
 
     positions.push(positions[index - 1] + gap)
     return positions
@@ -328,10 +343,13 @@ function updateConnector(connector, connectorLine, activeId, state) {
 
 
 function swapDetail(detail, milestone, state, onReady) {
+  const lightbox = state.lightbox
   const nextContent = renderDetail(milestone)
 
   if (!detail.classList.contains('is-visible') || !detail.innerHTML.trim()) {
     detail.innerHTML = nextContent
+    checkTextOverflow(detail)
+    attachImageClickHandlers(detail, lightbox)
     detail.classList.add('is-visible')
     window.requestAnimationFrame(onReady)
     return
@@ -342,10 +360,30 @@ function swapDetail(detail, milestone, state, onReady) {
   detail.classList.add('is-changing')
   state.detailTimer = window.setTimeout(() => {
     detail.innerHTML = nextContent
+    checkTextOverflow(detail)
+    attachImageClickHandlers(detail, lightbox)
     detail.classList.remove('is-changing')
     detail.classList.add('is-visible')
     window.requestAnimationFrame(onReady)
   }, DETAIL_SWAP_MS)
+}
+
+function checkTextOverflow(detail) {
+  const textEl = detail.querySelector('.timeline-card__text')
+  if (textEl) {
+    const hasOverflow = textEl.scrollHeight > textEl.clientHeight
+    textEl.style.overflowY = hasOverflow ? 'auto' : 'hidden'
+  }
+}
+
+function attachImageClickHandlers(detail, lightbox) {
+  const images = detail.querySelectorAll('.timeline-card__media img')
+  images.forEach((img) => {
+    img.style.cursor = 'pointer'
+    img.addEventListener('click', () => {
+      lightbox.open(img.src, img.alt)
+    })
+  })
 }
 
 function findNearestPoint(activeX, translate, milestones, positions) {
@@ -361,8 +399,10 @@ function findNearestPoint(activeX, translate, milestones, positions) {
 }
 
 function renderDetail(milestone) {
+  const typeClass = milestone.type === 'minor' ? 'timeline-card--minor' : 'timeline-card--major'
+  
   return `
-    <div class="timeline-card">
+    <div class="timeline-card ${typeClass}">
       <div class="timeline-card__media">
         ${renderMedia(milestone)}
       </div>

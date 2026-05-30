@@ -48,17 +48,15 @@ npm run check
 ```
 
 ## TODOs
-> loading: add a loading scene with a loading icon and a stylized dialogues box to tell the user what asset is being loaded now (P1)
+> loading: add a loading scene with a loading icon and a stylized dialogues box to tell the user what asset is being loaded now
 
-> performance: most of the problems and fps drops are because of animations (P1)
+> performance: most of the problems and fps drops are because of animations
 
-> navigation buttons should not hide in mobile (P1)
+> navigation buttons should not hide in mobile
 
-> refactor: remove unused codes and clear css (P3)
+> only scroll the description in timeline cards while the text is not fit in the border. because if the user trys to scroll and the pointer is on the description, it won't scroll the page.
 
-> only scroll description while the text is not fit in the border
-
-> in phone, lower the gap between points
+> in mobile, lower the gap between points in timeline track
 
 > hardly remove all hovering functionalities in mobile including hovering points in timeline and navigation buttons 
 
@@ -69,3 +67,5 @@ npm run check
 > add an animation for the transition between two points in timeline (just a simple fade in fade out for the points is okay)
 
 > being able to click on the media in timeline cards and open them in a simple pop up with a back button
+
+> refactor: remove unused codes and clear css
