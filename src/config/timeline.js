@@ -26,7 +26,7 @@ export const timelineData = {
       year: '2003.11',
       title: 'Born',
       type: 'major',
-      description: 'I was born in Tehran as the youngest member of a five-person family. Economically, we were upper middle class. The period in which I was born belonged to a generation that experienced a sudden leap in computer technologies, unfolding in parallel with our childhood. Fortunately, my family kept up to date with technology, and I also started working with it and became interested in it.',
+      description: 'Raised in Tehran within a well-resourced, tech-forward environment during the rapid evolution of computer technologies, which fostered a lasting passion and foundational aptitude for the **tech industry**.',
       media: singleMedia
     },
     {
@@ -34,7 +34,7 @@ export const timelineData = {
       year: '2015.1',
       title: 'Innate Passion for Tech',
       type: 'major',
-      description: 'I spent countless hours independently exploring the digital world, naturally gravitating towards **software development** and learning the fundamentals of `C++` and `Java`.',
+      description: 'Spent extensive time independently exploring the digital world, naturally gravitating toward **software development** and learning the fundamentals of `C++` and `Java`.',
       media: singleMedia
     },
     {
@@ -42,7 +42,7 @@ export const timelineData = {
       year: '2016.1',
       title: 'Coding for Convenience',
       type: 'minor',
-      description: 'Programming became a tool for convenience, automation, and pure fun for me. My early coding experience was far more than a Hello World. For example, instead of manually calculating my school exam percentages and scores on paper like everyone else, I wrote a Java program to do it for me.',
+      description: 'Leveraged early programming skills for practical automation and problem-solving, progressing beyond basic exercises to independently develop a custom `Java` tool for calculating academic grades.',
       media: singleMedia
     },
     {
@@ -50,7 +50,7 @@ export const timelineData = {
       year: '2017.1',
       title: 'The Storyteller',
       type: 'major',
-      description: 'It all started with storytelling. I had a strong passion for writing serialized stories. Deep world-building and a distinct sense of humor were the two key elements that kept my classmates engaged week after week.',
+      description: 'Maintained a strong interest in writing serialized stories, with a focus on deep **world-building** and a distinct **sense of humor** that consistently engaged classmates.',
       media: singleMedia
     },
     {
@@ -58,7 +58,7 @@ export const timelineData = {
       year: '2017.2',
       title: 'The Serialized Troublemaker',
       type: 'minor',
-      description: 'One of the serialized stories I wrote for composition class won a school competition and earned my teacher’s recommendations. However, the jokes and humor I used made me incredibly popular among my peers while simultaneously infuriating the teachers.',
+      description: 'One serialized story written for a composition class won a school competition and received teacher recommendations. Its humor significantly increased peer engagement while also drawing mixed reactions from teachers.',
       media: singleMedia
     },
     {
@@ -66,7 +66,7 @@ export const timelineData = {
       year: '2018.1',
       title: 'Exploring Visual Arts',
       type: 'major',
-      description: 'Seeking new ways to express ideas, I shifted my focus to cinema. I spent time studying art history, film directing, and the core fundamentals of the medium to understand visual storytelling better.',
+      description: 'Shifted focus to cinema as a medium for expression, studying **art history**, **film directing**, and core fundamentals to better understand **visual storytelling**.',
       media: singleMedia
     },
     {
@@ -74,7 +74,7 @@ export const timelineData = {
       year: '2019.10',
       title: 'The Animation Era',
       type: 'major',
-      description: 'Faced with the practical limitations of filmmaking, I transitioned to 3D Animation. I learned extensively from reliable sources like Digital Creator School videos, and consistently analyzed the production pipelines of major projects and reputable studios to understand industry-standard workflows.',
+      description: 'Transitioned to `3D Animation`, learning extensively from structured educational sources such as Digital Creator School and analyzing **production pipelines** of major projects and established studios to understand **industry-standard workflows**.',
       media: albumMedia
     },
     {
@@ -82,7 +82,7 @@ export const timelineData = {
       year: '2020.2',
       title: '3D as a Playground',
       type: 'minor',
-      description: 'Before doing professional work, 3D was my playground. I used it to design my own custom desktop wallpapers and create funny, cool renders just to entertain my friends.',
+      description: 'Used `3D` as a creative playground prior to professional work, designing custom desktop wallpapers and producing informal renders for personal use and peer entertainment.',
       media: singleMedia
     },
     {
@@ -90,15 +90,15 @@ export const timelineData = {
       year: '2020.10',
       title: 'Little Work',
       type: 'minor',
-      description: 'Eventually, I took my 3D skills into the semi-professional realm. I successfully delivered architectural rendering projects and even designed and rendered promotional materials for a speaker brand.',
+      description: 'Transitioned into semi-professional work by delivering **architectural rendering** projects and designing and rendering promotional materials for a speaker brand.',
       media: albumMedia
     },
     {
       id: 'first-ue-experience',
       year: '2021.4',
-      title: 'First Encounter with Unreal Engine',
+      title: 'First Encounter with UE',
       type: 'major',
-      description: 'Shortly before university, I started experimenting with `Unreal Engine 4.27`. I focused on **level design** and basic animations, though I intentionally avoided logic and `Blueprints` at the time, finding the coding aspect intimidating.',
+      description: 'Began experimenting with `Unreal Engine 4.27` prior to university, focusing on **level design** and basic animations, while intentionally avoiding `Blueprints` due to initial hesitation toward the coding aspects.',
       media: albumMedia
     },
     {
@@ -106,7 +106,7 @@ export const timelineData = {
       year: '2022.7',
       title: 'Embracing the Code & University',
       type: 'major',
-      description: 'Entering university as a Computer Engineering major at K. N. Toosi University of Technology bridged my artistic and technical sides. I didn’t just build functional academic projects; I focused heavily on non-functional requirements and extra polish. Because I always over-delivered, my peers constantly wanted to team up with me. Additionally, my strong academic performance led to me serving as a Teaching Assistant (TA) twice.',
+      description: 'Bridged technical and artistic disciplines during a `Computer Engineering` degree at **K. N. Toosi University of Technology**. Consistently delivered highly polished academic projects exceeding baseline requirements, built strong collaborative demand among peers, and earned two Teaching Assistant appointments.',
       media: singleMedia
     },
     {
@@ -114,7 +114,7 @@ export const timelineData = {
       year: '2023.1',
       title: 'Advanced Snake & Ladder',
       type: 'minor',
-      description: 'In this game, nothing had a fixed position—snakes, blocks, ladders, and various types of snakes were all dynamic. The game’s dice also had its own specific complexities. The main focus of the project was managing a **fair randomization structure** alongside `error handling` and resolving numerical collisions within the board matrix.',
+      description: 'Developed a version of Snake & Ladder where no elements had fixed positions—snakes, blocks, ladders, and variations of snakes were all dynamic. The dice system also included specific complexities, with a primary focus on implementing a **fair randomization structure**, robust `error handling`, and resolving numerical collisions within the board matrix.',
       media: albumMedia
     },
     {
@@ -122,7 +122,7 @@ export const timelineData = {
       year: '2023.2',
       title: 'Algorithm GUI',
       type: 'minor',
-      description: 'This was a well-known project aimed at graphically demonstrating the behavior of recursive algorithms. My chosen algorithm was the Koch Snowflake, implemented with a time complexity of 𝑂(log4𝑛).',
+      description: 'Implemented a graphical demonstration of **recursive algorithms**, selecting the Koch Snowflake and achieving a time complexity of 𝑂(log4n).',
       media: albumMedia
     },
     {
@@ -130,7 +130,7 @@ export const timelineData = {
       year: '2023.3',
       title: 'GameStore Back-End',
       type: 'minor',
-      description: 'For this project, students were tasked with developing their own custom game store. The main challenge was implementing a massive set of features, including a storefront, a friend system, donations, a messaging system, trading mechanics, multiple access levels, data management, and basic data encryption.',
+      description: 'Developed a custom game store system with an extensive feature set, including **storefront functionality**, **friend systems**, donations, a messaging system, **trading mechanics**, multiple access levels, **data management**, and basic **data encryption**.',
       media: albumMedia
     },
     {
@@ -138,7 +138,7 @@ export const timelineData = {
       year: '2023.4',
       title: 'CyberTank 2077',
       type: 'minor',
-      description: 'We were assigned to recreate the classic ‘Battle City’ game using the `JavaFX` library. Excited, I asked my professor if I could use a game engine like `Unreal Engine`, but he refused, stating the tools must be the same for everyone. After realizing `JavaFX` could somewhat handle 3D, I decided to build a **3D game anyway—without any game engine**. Interestingly, once I later familiarized myself with Unreal Engine’s source code, I realized how close my custom implementations were to real-world engine architectures, including leveling systems, loading mechanisms, I/O management, the `Game Loop`, and core `OOP` concepts. (More details: https://drive.google.com/file/d/1k882IGtzAkO6ZSqfkKVw221slod445pG/view?usp=drive_link)',
+      description: 'Recreated the classic “Battle City” game using the `JavaFX` library. Despite tool constraints, developed a `3D` game without a game engine. Later comparison my game with UE source code revealed close alignment with real-world engine architectures, including `leveling systems`, `loading mechanisms`, `I/O management`, the `Game Loop`, and core `OOP` concepts. ',
       media: albumMedia
     },
     {
@@ -146,7 +146,7 @@ export const timelineData = {
       year: '2023.11',
       title: 'Aysooda',
       type: 'minor',
-      description: 'As I mentioned earlier, my interest in coding was never purely academic; it was always a tool for convenience and fun. Alongside university assignments, I developed personal projects like **Aysooda**. This was a customized Windows task management and planning application built using `WinUI 3`, Microsoft’s newest and most beautiful UI framework at the time.',
+      description: 'Developed a personal project, **Aysooda**, as a customized Windows task management and planning application using `WinUI 3` & `C#`, Microsoft’s modern UI framework at the time.',
       media: albumMedia
     },
     {
@@ -154,7 +154,7 @@ export const timelineData = {
       year: '2025.2',
       title: 'Stepping into the Industry',
       type: 'major',
-      description: 'I officially stepped into the industry by joining a startup studio backed by Behsazan Holding (belonging to Bank Mellat, one of the country’s largest banks). Here, I worked on metaverse environments, VR simulations, and AI avatar platforms.',
+      description: 'Entered the industry by joining a startup studio backed by Behsazan Holding (affiliated with Bank Mellat), contributing to metaverse environments, VR simulations, and AI avatar platforms.',
       media: albumMedia
     },
     {
@@ -162,7 +162,7 @@ export const timelineData = {
       year: '2025.8',
       title: 'Bridging Art and Hardware',
       type: 'minor',
-      description: 'My role required me to navigate challenging meetings with both the art and investment teams. We tackled complex issues, from designing the architecture for avatar animations to balancing strict hardware budgets while pushing for the highest possible visual quality.',
+      description: 'Participated in cross-functional discussions with art and investment teams, addressing complex challenges such as **avatar animation architecture** and balancing strict hardware budgets with **visual quality** targets.',
       media: singleMedia
     },
     {
@@ -170,16 +170,17 @@ export const timelineData = {
       year: '2025.10',
       title: 'The Pixel Streaming Paradigm',
       type: 'minor',
-      description: 'To bypass hardware limitations for end-users, I worked on a **Pixel Streaming** system. This allowed users to experience our high-end `Unreal Engine` applications using the company’s servers, requiring zero hardware investment on their end.',
+      description: 'Developed a **Pixel Streaming** solution to overcome end-user hardware limitations, enabling access to high-end `Unreal Engine` applications through company-hosted servers without requiring local hardware investment.',
       media: singleMedia
     },
     {
       id: 'technical-director',
       year: '2026.1',
       title: 'Towards Leading the Tech',
-      type: 'major',
-      description: 'Following my internship, I rapidly grew within the studio, taking on increasingly complex challenges. I eventually stepped into the role of Technical Director, overseeing engine architecture and project integration while collaborating with specialized AI backend and UX teams.',
+      type: 'minor',
+      description: 'Following the internship, progressed into increasingly complex responsibilities and ultimately assumed the role of **Technical Director**, overseeing **engine architecture**, **project integration**, and collaboration with **AI backend** and **UX** teams.',
       media: singleMedia
     }
   ]
+
 }
