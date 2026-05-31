@@ -831,6 +831,7 @@ body:not(.is-hero) .section-card strong {
 }
 
 .timeline-card {
+  --timeline-segment-color: var(--accent-strong);
   display: grid;
   margin-left: 32px;
   margin-right: 32px;
@@ -904,6 +905,24 @@ body:not(.is-hero) .section-card strong {
   font-size: 0.86rem;
 }
 
+.timeline-card__relation {
+  width: max-content;
+  max-width: 100%;
+  margin: -2px 0 10px;
+  padding: 5px 10px;
+  overflow: hidden;
+  color: var(--timeline-segment-color);
+  font-family: var(--font-code);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border: 1px solid color-mix(in srgb, var(--timeline-segment-color) 48%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--timeline-segment-color) 12%, transparent);
+}
+
 .timeline-card__title {
   flex: 0 0 auto;
   margin: 0 0 12px;
@@ -921,11 +940,11 @@ body:not(.is-hero) .section-card strong {
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
-  scrollbar-color: var(--accent-strong) rgba(255, 255, 255, 0.08);
+  scrollbar-color: var(--timeline-segment-color) rgba(255, 255, 255, 0.08);
   color: var(--muted);
   font-size: clamp(0.95rem, 1.4vw, 1.08rem);
   line-height: 1.65;
-  border: 1px solid rgba(103, 232, 249, 0.28);
+  border: 1px solid color-mix(in srgb, var(--timeline-segment-color) 34%, transparent);
   border-radius: 16px;
   background:
     linear-gradient(180deg, rgba(5, 11, 20, 0.28), rgba(5, 11, 20, 0.08)),
@@ -945,7 +964,7 @@ body:not(.is-hero) .section-card strong {
 .timeline-card__text::-webkit-scrollbar-thumb {
   border: 2px solid rgba(5, 11, 20, 0.72);
   border-radius: 999px;
-  background: linear-gradient(180deg, var(--accent-strong), var(--accent));
+  background: linear-gradient(180deg, var(--timeline-segment-color), color-mix(in srgb, var(--timeline-segment-color) 70%, var(--accent)));
 }
 
 .timeline-card__text strong {
@@ -955,12 +974,12 @@ body:not(.is-hero) .section-card strong {
 
 .timeline-card__text code {
   padding: 0.08em 0.32em;
-  color: var(--accent-strong);
+  color: var(--timeline-segment-color);
   font-family: var(--font-code);
   font-size: 0.96em;
-  border: 1px solid rgba(103, 232, 249, 0.22);
+  border: 1px solid color-mix(in srgb, var(--timeline-segment-color) 28%, transparent);
   border-radius: 7px;
-  background: rgba(103, 232, 249, 0.08);
+  background: color-mix(in srgb, var(--timeline-segment-color) 9%, transparent);
 }
 
 .timeline-viewport {
@@ -998,8 +1017,8 @@ body:not(.is-hero) .section-card strong {
   inset: 0;
   width: 2px;
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(103, 232, 249, 0), rgba(103, 232, 249, 0.82));
-  box-shadow: 0 0 14px rgba(103, 232, 249, 0.36);
+  background: linear-gradient(180deg, transparent, var(--timeline-segment-color));
+  box-shadow: 0 0 14px color-mix(in srgb, var(--timeline-segment-color) 44%, transparent);
 }
 
 .timeline-connector path {
@@ -1024,8 +1043,27 @@ body:not(.is-hero) .section-card strong {
   height: 3px;
   border-radius: 999px;
   background:
-    linear-gradient(90deg, transparent, var(--accent), var(--accent-strong), var(--accent), transparent),
+    linear-gradient(90deg, transparent, rgba(170, 192, 221, 0.3), rgba(170, 192, 221, 0.42), rgba(170, 192, 221, 0.3), transparent),
     rgba(255, 255, 255, 0.08);
+  transform: translateY(-50%);
+}
+
+.timeline-segment-ranges {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.timeline-segment-range {
+  position: absolute;
+  top: 50%;
+  height: 7px;
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg, transparent, var(--timeline-segment-color) 12%, var(--timeline-segment-color) 88%, transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--timeline-segment-color) 34%, transparent);
+  opacity: 0.78;
   transform: translateY(-50%);
 }
 
@@ -1062,13 +1100,14 @@ body:not(.is-hero) .section-card strong {
   width: 0;
   height: 8px;
   border-radius: 999px;
-  background: radial-gradient(circle, var(--accent-strong), rgba(103, 232, 249, 0.4) 56%, transparent 76%);
-  box-shadow: 0 0 20px rgba(103, 232, 249, 0.32);
+  background: radial-gradient(circle, var(--timeline-segment-color), color-mix(in srgb, var(--timeline-segment-color) 42%, transparent) 56%, transparent 76%);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--timeline-segment-color) 38%, transparent);
   pointer-events: none;
   transform: translateY(-50%);
 }
 
 .timeline-point {
+  --timeline-segment-color: var(--accent-strong);
   position: absolute;
   z-index: 2;
   top: 50%;
@@ -1106,18 +1145,20 @@ body:not(.is-hero) .section-card strong {
 .timeline-point--major .timeline-point__dot {
   width: 24px;
   height: 24px;
-  border: 4px solid var(--accent);
+  border: 4px solid var(--timeline-segment-color);
   background:
-    radial-gradient(circle, var(--accent-strong) 0 28%, #091523 30% 100%);
-  box-shadow: 0 0 0 8px rgba(124, 156, 255, 0.09), 0 0 20px rgba(124, 156, 255, 0.2);
+    radial-gradient(circle, color-mix(in srgb, var(--timeline-segment-color) 82%, #ffffff) 0 28%, #091523 30% 100%);
+  box-shadow:
+    0 0 0 8px color-mix(in srgb, var(--timeline-segment-color) 12%, transparent),
+    0 0 20px color-mix(in srgb, var(--timeline-segment-color) 28%, transparent);
 }
 
 .timeline-point--minor .timeline-point__dot {
-  width: 10px;
-  height: 10px;
-  border-width: 0;
-  background: rgba(170, 192, 221, 0.75);
-  box-shadow: none;
+  width: 13px;
+  height: 13px;
+  border: 2px solid color-mix(in srgb, var(--timeline-segment-color) 75%, #ffffff);
+  background: #07111f;
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--timeline-segment-color) 12%, transparent);
 }
 
 .timeline-point--minor .timeline-point__minor-mark {
@@ -1126,7 +1167,7 @@ body:not(.is-hero) .section-card strong {
   top: 50%;
   width: 1px;
   height: 28px;
-  background: linear-gradient(180deg, transparent, rgba(170, 192, 221, 0.5), transparent);
+  background: linear-gradient(180deg, transparent, var(--timeline-segment-color), transparent);
   transform: translate(-50%, -50%);
 }
 
@@ -1137,7 +1178,7 @@ body:not(.is-hero) .section-card strong {
   top: 50%;
   width: 48px;
   height: 48px;
-  border: 1px solid var(--accent-strong);
+  border: 1px solid var(--timeline-segment-color);
   border-radius: 999px;
   opacity: 0;
   transform: translate(-50%, -50%) scale(0.65);
@@ -1157,9 +1198,11 @@ body:not(.is-hero) .section-card strong {
 .timeline-point.is-active .timeline-point__dot,
 .timeline-point:hover .timeline-point__dot,
 .timeline-point:focus-visible .timeline-point__dot {
-  border-color: var(--accent-strong);
-  background: var(--accent-strong);
-  box-shadow: 0 0 0 8px rgba(103, 232, 249, 0.14), 0 0 24px rgba(103, 232, 249, 0.5);
+  border-color: color-mix(in srgb, var(--timeline-segment-color) 78%, #ffffff);
+  background: var(--timeline-segment-color);
+  box-shadow:
+    0 0 0 8px color-mix(in srgb, var(--timeline-segment-color) 16%, transparent),
+    0 0 24px color-mix(in srgb, var(--timeline-segment-color) 56%, transparent);
 }
 
 .timeline-point--minor.is-active .timeline-point__dot,
@@ -1488,8 +1531,8 @@ body:not(.is-hero) .section-card strong {
   }
 
   .timeline-point--minor:hover .timeline-point__dot {
-    width: 10px;
-    height: 10px;
+    width: 13px;
+    height: 13px;
   }
 
   .timeline-point:hover .timeline-point__label,
@@ -1502,19 +1545,27 @@ body:not(.is-hero) .section-card strong {
 /* ========== ENHANCED MINOR/MAJOR DIFFERENTIATION ========== */
 
 .timeline-card--minor {
-  opacity: 0.85;
-  transform: scale(0.92);
-  border: 1px solid rgba(170, 192, 221, 0.2);
+  width: min(100%, 820px);
+  height: min(100%, 420px);
+  opacity: 0.94;
+  border: 1px dashed color-mix(in srgb, var(--timeline-segment-color) 58%, transparent);
+  border-left: 8px solid var(--timeline-segment-color);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--timeline-segment-color) 18%, transparent), rgba(255, 255, 255, 0.04)),
+    rgba(255, 255, 255, 0.045);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.28),
+    inset 0 0 0 1px color-mix(in srgb, var(--timeline-segment-color) 10%, transparent);
 }
 
 .timeline-card--minor .timeline-card__eyebrow {
-  color: var(--muted);
+  color: var(--timeline-segment-color);
   font-size: 0.8rem;
 }
 
 .timeline-card--minor .timeline-card__title {
-  font-size: 1.3rem;
-  color: var(--muted);
+  font-size: clamp(1.2rem, 2.2vw, 1.7rem);
+  color: color-mix(in srgb, var(--timeline-segment-color) 72%, var(--text));
 }
 
 .timeline-card--minor .timeline-card__media {
@@ -1522,11 +1573,14 @@ body:not(.is-hero) .section-card strong {
 }
 
 .timeline-card--major {
-  border: 2px solid rgba(124, 156, 255, 0.3);
+  border: 2px solid color-mix(in srgb, var(--timeline-segment-color) 45%, transparent);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06)),
+    radial-gradient(circle at top left, color-mix(in srgb, var(--timeline-segment-color) 20%, transparent), transparent 34%);
 }
 
 .timeline-card--major .timeline-card__title {
-  color: var(--accent-strong);
+  color: color-mix(in srgb, var(--timeline-segment-color) 72%, #ffffff);
 }
 
 .timeline-point--minor {
@@ -1550,9 +1604,9 @@ body:not(.is-hero) .section-card strong {
   top: -30px;
   width: 2px;
   height: 20px;
-  background: linear-gradient(180deg, rgba(124, 156, 255, 0.3), transparent);
+  background: linear-gradient(180deg, var(--timeline-segment-color), transparent);
   transform: translateX(-50%);
-  opacity: 0.5;
+  opacity: 0.72;
 }
 
 /* ========== LIGHTBOX ========== */

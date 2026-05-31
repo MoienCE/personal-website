@@ -9,6 +9,7 @@ const DEFAULT_MAX_POINT_GAP = 460
 const DEFAULT_MIN_SCROLL_VH = 180
 const DETAIL_SWAP_MS = 140
 const ACTIVE_UPDATE_THRESHOLD = 24
+const SEGMENT_COLORS = ['#67e8f9', '#fbbf24', '#34d399', '#fb7185', '#a78bfa', '#f97316']
 
 export function createTimeline(scene, data) {
   const viewport = scene.querySelector('[data-timeline-viewport]')
@@ -121,7 +122,7 @@ export function createTimeline(scene, data) {
 }
 
 function normalizeMilestones(milestones = []) {
-  return milestones
+  const sortedMilestones = milestones
     .map((milestone) => {
       const timelineDate = parseTimelineDate(milestone?.year)
 
@@ -138,6 +139,31 @@ function normalizeMilestones(milestones = []) {
     })
     .filter(Boolean)
     .sort((first, second) => first.year - second.year)
+
+  return assignSegmentMetadata(sortedMilestones)
+}
+
+function assignSegmentMetadata(milestones) {
+  let currentMajor = null
+  let currentSegmentIndex = -1
+
+  return milestones.map((milestone) => {
+    if (milestone.type === 'major') {
+      currentSegmentIndex += 1
+      currentMajor = milestone
+    }
+
+    const segmentIndex = Math.max(currentSegmentIndex, 0)
+    const segmentColor = SEGMENT_COLORS[segmentIndex % SEGMENT_COLORS.length]
+
+    return {
+      ...milestone,
+      segmentColor,
+      segmentIndex,
+      segmentMajorId: currentMajor?.id ?? milestone.id,
+      segmentMajorTitle: currentMajor?.title ?? milestone.title
+    }
+  })
 }
 
 function parseTimelineDate(year) {
@@ -174,8 +200,40 @@ function normalizeMedia(media) {
 
 function renderPoints(track, milestones) {
   track.innerHTML = `
+    <div class="timeline-segment-ranges" data-timeline-segment-ranges aria-hidden="true">
+      ${createTimelineSegments(milestones).map(renderTimelineSegment).join('')}
+    </div>
     <span class="timeline-segment-highlight" data-timeline-segment aria-hidden="true"></span>
     ${milestones.map(renderPoint).join('')}
+  `
+}
+
+function createTimelineSegments(milestones) {
+  return milestones.reduce((segments, milestone, index) => {
+    if (milestone.type !== 'major') return segments
+
+    const nextMajor = milestones.slice(index + 1).find((item) => item.type === 'major')
+    const endMilestone = nextMajor ?? milestones[milestones.length - 1]
+
+    segments.push({
+      startId: milestone.id,
+      endId: endMilestone.id,
+      color: milestone.segmentColor
+    })
+
+    return segments
+  }, [])
+}
+
+function renderTimelineSegment(segment) {
+  return `
+    <span
+      class="timeline-segment-range"
+      data-timeline-segment-range
+      data-segment-start="${escapeHtml(segment.startId)}"
+      data-segment-end="${escapeHtml(segment.endId)}"
+      style="--timeline-segment-color: ${escapeHtml(segment.color)}"
+    ></span>
   `
 }
 
@@ -188,6 +246,8 @@ function renderPoint(milestone) {
       class="timeline-point ${isMajor ? 'timeline-point--major' : 'timeline-point--minor'}"
       type="button"
       data-timeline-point="${escapeHtml(milestone.id)}"
+      data-timeline-segment="${escapeHtml(String(milestone.segmentIndex))}"
+      style="--timeline-segment-color: ${escapeHtml(milestone.segmentColor)}"
       aria-label="${escapeHtml(label)}"
     >
       <span class="timeline-point__dot" aria-hidden="true"></span>
@@ -229,6 +289,25 @@ function layoutTrack(scene, viewport, track, milestones, points, settings, state
 
     state.positions.set(point.dataset.timelinePoint, x)
     point.style.left = `${x}px`
+  })
+
+  layoutTimelineSegments(track, state.positions)
+}
+
+function layoutTimelineSegments(track, positions) {
+  const ranges = track.querySelectorAll('[data-timeline-segment-range]')
+
+  ranges.forEach((range) => {
+    const start = positions.get(range.dataset.segmentStart)
+    const end = positions.get(range.dataset.segmentEnd)
+
+    if (!Number.isFinite(start) || !Number.isFinite(end)) return
+
+    const left = Math.min(start, end)
+    const width = Math.max(28, Math.abs(end - start))
+
+    range.style.left = `${left}px`
+    range.style.width = `${width}px`
   })
 }
 
@@ -304,6 +383,11 @@ function updateActiveDecorations(id, milestones, segment, connector, connectorLi
 
   state.lastDecoratedId = id
   state.lastDecorationTranslate = state.translate
+  const activeMilestone = milestones.find((milestone) => milestone.id === id)
+
+  if (activeMilestone) {
+    connector?.style.setProperty('--timeline-segment-color', activeMilestone.segmentColor)
+  }
 
   updateLocalSegment(segment, id, milestones, state.positions)
   updateConnector(connector, connectorLine, id, state)
@@ -326,6 +410,7 @@ function updateLocalSegment(segment, activeId, milestones, positions) {
 
   const width = activeMilestone.type === 'minor' ? 74 : 132
 
+  segment.style.setProperty('--timeline-segment-color', activeMilestone.segmentColor)
   segment.style.left = `${center - width / 2}px`
   segment.style.width = `${width}px`
 }
@@ -400,14 +485,18 @@ function findNearestPoint(activeX, translate, milestones, positions) {
 
 function renderDetail(milestone) {
   const typeClass = milestone.type === 'minor' ? 'timeline-card--minor' : 'timeline-card--major'
+  const relation = milestone.type === 'minor'
+    ? `<p class="timeline-card__relation"> ${escapeHtml(milestone.segmentMajorTitle)}</p>`
+    : ''
   
   return `
-    <div class="timeline-card ${typeClass}">
+    <div class="timeline-card ${typeClass}" style="--timeline-segment-color: ${escapeHtml(milestone.segmentColor)}">
       <div class="timeline-card__media">
         ${renderMedia(milestone)}
       </div>
       <div class="timeline-card__body">
         <p class="timeline-card__eyebrow">${escapeHtml(milestone.yearLabel)}</p>
+        ${relation}
         <h3 class="timeline-card__title">${escapeHtml(milestone.title || 'Memory')}</h3>
         <div class="timeline-card__text" tabindex="0">${renderRichText(milestone.description || '')}</div>
       </div>

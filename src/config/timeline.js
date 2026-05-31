@@ -16,7 +16,7 @@ const albumMedia = {
 export const timelineData = {
   startYear: 2000,
   activeOffset: 0.5,
-  pointGap: 280,
+  pointGap: 100,
   minPointGap: 220,
   maxPointGap: 440,
   minScrollVh: 180,
